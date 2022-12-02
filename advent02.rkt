@@ -6,9 +6,26 @@
 (define (shape-symbol s)
   (hash-ref shape-symbols s))
 
-(define strategy-symbols #hash(("X" . 'rock) ("Y" . 'paper) ("Z" . 'scissors)))
-(define (strategy-symbol s)
-  (hash-ref strategy-symbols s))
+(define first-strategy-symbols #hash(("X" . 'rock) ("Y" . 'paper) ("Z" . 'scissors)))
+(define (first-strategy-symbol s)
+  (hash-ref first-strategy-symbols s))
+
+(define second-strategy-symbols #hash(("X" . 'lose) ("Y" . 'draw) ("Z" . 'win)))
+(define (second-strategy-symbol s)
+  (hash-ref second-strategy-symbols s))
+
+(define second-strategy-choices #hash(
+                        (('rock . 'win) . 'paper)
+                        (('rock . 'lose) . 'scissors)
+                        (('rock . 'draw) . 'rock)
+                        (('scissors . 'win) . 'rock)
+                        (('scissors . 'lose) . 'paper)
+                        (('scissors . 'draw) . 'scissors)
+                        (('paper . 'win) . 'scissors)
+                        (('paper . 'lose) . 'rock)
+                        (('paper . 'draw) . 'paper)))
+(define (second-strategy-choice op se)
+  (hash-ref second-strategy-choices (cons op se)))
 
 (define shape-scores #hash(('rock . 1) ('paper . 2) ('scissors . 3)))
 
@@ -32,8 +49,20 @@
 (define (round-score op se)
   (+ (shape-score se) (outcome-score op se)))
 
-(define (total-score l)
-  (apply + (map (λ (p) (round-score (shape-symbol(first p)) (strategy-symbol (second p)))) l)))
+(define (first-total-score l)
+  (for*/sum ([p (in-list l)])
+    (let ([op (shape-symbol(first p))]
+          [se (first-strategy-symbol (second p))])
+      (round-score op se))))
 
-(total-score test-data)
-(total-score data)
+(define (second-total-score l)
+  (for*/sum ([p (in-list l)])
+    (let* ([op (shape-symbol(first p))]
+          [se (second-strategy-choice op (second-strategy-symbol (second p)))])
+      (round-score op se))))
+
+(first-total-score test-data)
+(first-total-score data)
+
+(second-total-score test-data)
+(second-total-score data)
