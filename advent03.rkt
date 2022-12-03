@@ -29,8 +29,5 @@
             (+ acc s)
             (loop (+ acc s) (take rhs 3) (drop rhs 3)))))) 
          
-          
-    
-             
-              
-          
+(sum-of-badge-priorities test-data)
+(sum-of-badge-priorities data)
