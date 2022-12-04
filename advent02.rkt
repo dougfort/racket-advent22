@@ -1,5 +1,7 @@
 #lang racket
 
+;; 
+
 (require "advent02-data.rkt")
 
 (define shape-symbols #hash(("A" . 'rock) ("B" . 'paper) ("C" . 'scissors)))
