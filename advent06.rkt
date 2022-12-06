@@ -5,7 +5,7 @@
 (require "advent06-data.rkt")
 
 (define (find-unique-characters size data)
-  (define buffer (list->vector (string->list (string-trim data))))
+  (define buffer ((compose1 list->vector string->list string-trim) data))
   (for/or ([i (in-range (vector-length buffer))])
     (let* ([last-pos (+ i size)]
            [vec (vector-copy buffer i last-pos)])
