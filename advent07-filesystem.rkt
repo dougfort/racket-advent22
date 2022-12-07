@@ -2,7 +2,16 @@
 
 ;; 
 
-(provide make-filesystem fs-pop-dir fs-push-dir fs-add-dir fs-add-file fs-dir-sizes)
+(provide
+ total-space
+ root-path
+ make-filesystem
+ fs-pop-dir
+ fs-push-dir
+ fs-add-dir
+ fs-add-file
+ fs-dir-size
+ fs-dir-sizes)
 
 (module+ test
   (require rackunit))
@@ -22,12 +31,15 @@
 
 (define root-dir-name "/")
 
+(define root-path (list root-dir-name))
+
+(define total-space 70000000)
+
 (define (make-filesystem)
   (define db (make-hash))
-  (define path (list root-dir-name))
-  (define work (directory root-dir-name empty empty))
-  (hash-set! db path work)
-  (filesystem db path work))
+  (define root-dir (directory root-dir-name empty empty))
+  (hash-set! db root-path root-dir)
+  (filesystem db root-path root-dir))
 
 (define (fs-pop-dir fs)
   (let* ([path (list-tail (filesystem-path fs) 1)]
