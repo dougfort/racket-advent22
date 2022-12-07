@@ -11,24 +11,23 @@
 
 (define (parse text)
   (for/fold ([fs (make-filesystem)]
-             [state ""]
              #:result fs)
             ([line (in-list text)])
     (cond
-      [(member line '("$ cd /" "$ ls" )) (values fs state)]
+      [(member line '("$ cd /" "$ ls" )) fs]
       [(string-prefix? line "$ cd ")
        (define dir (string-trim line "$ cd "))
        (if (equal? dir "..")
-           (values (fs-pop-dir fs) state)
-           (values (fs-push-dir fs dir) state))]
+           (fs-pop-dir fs)
+           (fs-push-dir fs dir))]
       [(string-prefix? line "dir ")
        (define dir (string-trim line "dir "))
-       (values (fs-add-dir fs dir) state)]
+       (fs-add-dir fs dir)]
       [else
        (let* ([split-line (string-split line)]
               [file-size (string->number (first split-line))]
               [file-name (second split-line)])
-         (values (fs-add-file fs file-name file-size) state))])))
+         (fs-add-file fs file-name file-size))])))
 
 (define (split raw)
   (string-split (string-trim raw) "\n"))
