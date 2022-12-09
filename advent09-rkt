@@ -8,13 +8,19 @@
 (module+ test
   (require rackunit))
 
-(define (rope-journey moves)
-  (define rope (make-rope))
-  (define db (make-hash (list (cons (rope-tail rope) #t))))
+(define (rope-journey n start moves)
+  (define rope (make-rope n start))
+  (define db (make-hash (list (cons start #t))))
   (for/fold ([rope rope]
-              [db db]
-              #:result db)
-             ([move (in-list moves)])
+             [db db]
+             #:result db)
+            ([move (in-list moves)])
     (let ([next-rope (move-rope rope move)])
-      (hash-set! db (rope-tail rope) #t)
+      (hash-set! db (last next-rope) #t)
       (values next-rope db))))
+
+(hash-count (rope-journey 2 '(0 . 0) test-2rope-data))
+(hash-count (rope-journey 2 '(0 . 0) data))
+(hash-count (rope-journey 10 '(0 . 0) test-2rope-data))
+(hash-count (rope-journey 10 '(11 . 5) test-10rope-data))
+(hash-count (rope-journey 10 '(0 . 0) data))

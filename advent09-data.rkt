@@ -2,7 +2,7 @@
 
 ;; 
 
-(provide test-data data)
+(provide test-2rope-data test-10rope-data data)
 
 ;; return a vector pair to add to a location
 (define (create-move s)
@@ -24,7 +24,7 @@
             ([s (string-split (string-trim d) "\n")])
   (append acc (create-moves s))))
 
-(define raw-test-data
+(define raw-test-2rope-data
   "
 R 4
 U 4
@@ -35,7 +35,20 @@ D 1
 L 5
 R 2
 ")
-(define test-data (parse raw-test-data))
+(define test-2rope-data (parse raw-test-2rope-data))
+
+(define raw-test-10rope-data
+  "
+R 5
+U 8
+L 8
+D 3
+R 17
+D 10
+L 25
+U 20
+")
+(define test-10rope-data (parse raw-test-10rope-data))
 
 (define raw-data
   "
