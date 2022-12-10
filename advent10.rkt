@@ -7,13 +7,7 @@
 (module+ test
   (require rackunit))
 
-(define (probe? cycle)
-  (cond
-    [(< cycle 20) #f]
-    [(= cycle 20) #t]
-    [else (zero? (remainder (- cycle 20) 40))]))
-
-(define (analyze-cpu d)
+(define (cycle-cpu d)
   (for/fold ([acc empty]             
              [cycle 1]
              [x 1]
@@ -21,20 +15,23 @@
             ([v (in-list d)])
     (cond
       [(null? v)
-       (if (probe? cycle)
-           (values (cons (cons cycle x) acc) (add1 cycle) x)
-           (values acc (add1 cycle) x))]
+       (values (cons x acc) (add1 cycle) x)]
       [else
-       (cond
-         [(probe? cycle)
-          (values (cons (cons cycle x) acc) (+ cycle 2) (+ x v))]
-         [(probe? (add1 cycle))
-          (values (cons (cons (add1 cycle) x) acc) (+ cycle 2) (+ x v))]
-         [else (values acc (+ cycle 2) (+ x v))])])))
+       (let ([acc (cons x acc)]) 
+         (values (cons x acc) (+ cycle 2) (+ x v)))])))
+
+(define (probe? cycle)
+  (cond
+    [(< cycle 20) #f]
+    [(= cycle 20) #t]
+    [else (zero? (remainder (- cycle 20) 40))]))
 
 (define (sum-of-signal-strengths l)
-  (for/sum ([p (in-list l)])
-    (* (car p) (cdr p))))
-
-(sum-of-signal-strengths (analyze-cpu test-data))
-(sum-of-signal-strengths (analyze-cpu data))
+  (for/sum ([i (in-naturals)]
+            [p (in-list l)])
+    (if (probe? (add1 i))
+        (* (add1 i) p)
+        0)))
+    
+(sum-of-signal-strengths (cycle-cpu test-data))
+(sum-of-signal-strengths (cycle-cpu data))
