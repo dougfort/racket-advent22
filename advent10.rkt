@@ -35,3 +35,26 @@
     
 (sum-of-signal-strengths (cycle-cpu test-data))
 (sum-of-signal-strengths (cycle-cpu data))
+
+(define crt-width 40)
+(define crt-height 6)
+
+(define (in-sprite? pos x)
+  (for/or ([i (in-inclusive-range (- x 1) (+ x 1))])
+    (= pos i)))
+
+(define (load-crt-buffer l)
+  (define buffer-size (* crt-width crt-height))
+  (for/vector #:length buffer-size ([i (in-range buffer-size)]
+                                    [x (in-list l)])
+    (if  (in-sprite? (remainder i crt-width) x)
+         #\#
+         #\.)))
+    
+(define (display-crt buffer)
+  (let loop ([buf-list (vector->list buffer)])
+    (unless (empty? buf-list)
+      (let-values ([(h t) (split-at buf-list crt-width)])
+        (println (list->string h))
+        (loop t)))))
+        
