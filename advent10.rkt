@@ -57,4 +57,6 @@
       (let-values ([(h t) (split-at buf-list crt-width)])
         (println (list->string h))
         (loop t)))))
-        
+
+(display-crt (load-crt-buffer (cycle-cpu test-data)))
+(display-crt (load-crt-buffer (cycle-cpu data)))
