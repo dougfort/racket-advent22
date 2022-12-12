@@ -44,9 +44,11 @@
               new-scores
               (loop next-i new-scores queue-vec)))))))
                
-(define (monkey-business d)
-  (let ([scores (take (sort (watch-monkeys 20 d) >) 2)])
+(define (monkey-business n d)
+  (let ([scores (take (sort (watch-monkeys n d) >) 2)])
     (* (first scores) (second scores))))
 
-(monkey-business test-data)
-(monkey-business data)
+(monkey-business 20 test-data)
+(monkey-business 20 data)
+(monkey-business 10000 test-data)
+(monkey-business 10000 data)

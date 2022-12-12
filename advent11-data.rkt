@@ -20,7 +20,21 @@
   (cond
     [(equal? s "*") *]
     [(equal? s "+") +]
-    [else (error (format "unknown op ~s"))]))
+    [else (error (format "unknown op ~s" s))]))
+
+(define test-modulus (apply * (list 23 19 13 17)))
+(define modulus (apply * (list 2 13 5 3 11 17 7 19)))
+(define (modular-add m)
+  (λ (lhs rhs) (remainder (+ lhs rhs) m)))
+
+(define (modular-multiply m)
+  (λ (lhs rhs) (remainder (* lhs rhs) m)))
+
+(define (parse-modular-op m s)
+  (cond
+    [(equal? s "*") (modular-multiply m)]
+    [(equal? s "+") (modular-add m)]
+    [else (error (format "unknown op ~s" s))]))
 
 ;; parse operation returns λ that takes a worry value and returns a new worry value
 (define (parse-operation raw-operation)
@@ -30,9 +44,17 @@
       (if (number? rhs)
           (λ (old) (op old rhs))
           (λ (old) (op old old))))))
-        
+
+(define (parse-modular-operation m raw-operation)
+  (let ([l (string-split (string-trim (string-trim raw-operation) "Operation: new = old "))])
+    (let ([op (parse-modular-op m (first l))]
+          [rhs (string->number (second l))])
+      (if (number? rhs)
+          (λ (old) (op old rhs))
+          (λ (old) (op old old))))))
+
 ;; each monkey has a queue of worry levels, identifying pensing items
-(define (parse-monkey raw-monkey)
+(define (parse-relief-monkey raw-monkey)
   (define relief (λ (l) (quotient l 3)))
   (define split-monkey (string-split raw-monkey "\n"))
   (define queue (parse-queue (second split-monkey)))
@@ -44,11 +66,28 @@
                      (cons new next-monkey))))
   (list monkey queue))
 
+(define (parse-modular-monkey m raw-monkey)
+  (define relief (λ (l) (quotient l 3)))
+  (define split-monkey (string-split raw-monkey "\n"))
+  (define queue (parse-queue (second split-monkey)))
+  (define operation (parse-modular-operation m (third split-monkey)))
+  (define test-fn (parse-test (fourth split-monkey) (fifth split-monkey) (sixth split-monkey)))
+  (define monkey (λ (old)
+                   (let* ([new (operation old)]
+                          [next-monkey (test-fn new)])
+                     (cons new next-monkey))))
+  (list monkey queue))
+
 ;; parse returns a list of pairs of (monkey . queue)
-(define (parse raw)
+(define (parse-relief raw)
   (for/list ([raw-monkey (string-split (string-trim raw) "\n\n")])
-    (parse-monkey raw-monkey)))
+    (parse-relief-monkey raw-monkey)))
   
+;; parse returns a list of pairs of (monkey . queue)
+(define (parse-modular m raw)
+  (for/list ([raw-monkey (string-split (string-trim raw) "\n\n")])
+    (parse-modular-monkey m raw-monkey)))
+
 (define raw-test-data
   "
 Monkey 0:
@@ -78,9 +117,9 @@ Monkey 3:
   Test: divisible by 17
     If true: throw to monkey 0
     If false: throw to monkey 1")
-(define test-data (parse raw-test-data))
+(define test-data (parse-modular test-modulus raw-test-data))
 
 (define raw-data
   (port->string (open-input-file "advent11.data") #:close? #t))
 
-(define data (parse raw-data))
+(define data (parse-modular modulus raw-data))
