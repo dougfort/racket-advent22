@@ -2,7 +2,13 @@
 
 ;; 
 
-(provide heightmap heightmap-start-pos heightmap-end-pos heightmap-neighbors heightmap-ref)
+(provide
+ heightmap
+ heightmap-start-pos
+ heightmap-end-pos
+ heightmap-neighbors
+ heightmap-ref
+ heightmap-low-points)
 
 (struct heightmap (height width vec start-pos end-pos)
   #:transparent)
@@ -25,3 +31,10 @@
   (define right (if (= c (- (heightmap-width hm) 1)) #f (heightmap-pos hm r (add1 c))))
   (define down (if (= r (- (heightmap-height hm) 1)) #f (heightmap-pos hm (add1 r) c)))
   (filter (λ (x) x) (list left up right down)))
+
+;; returns a list of the positions of all the lowest ('a') points in the heightmap
+(define (heightmap-low-points hm)
+  (for/list ([i (in-naturals)]
+             [val (in-list (vector->list (heightmap-vec hm)))]
+             #:when (= val 1))
+    i))

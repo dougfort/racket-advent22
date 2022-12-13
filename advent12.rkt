@@ -23,25 +23,21 @@
   (define-values (path-list rest) (split-at q 1))
   (values (first path-list) rest))
 
-(define (find-best-signal hm)
-  (define db (make-hash (list (cons (heightmap-start-pos hm) #t))))
+(define (find-best-signal hm start-pos)
+  (define db (make-hash (list (cons start-pos #t))))
   (let loop ([acc empty]
-             [q (make-queue (heightmap-start-pos hm))])
+             [q (make-queue start-pos)])
     (cond
-      [(empty? q)
-       (println "queue is empty")
-       acc]
+      [(empty? q) acc]
       [else
        (define-values (path next-q) (queue-pop q))
        (cond
          [(= (first path) (heightmap-end-pos hm))
-          (printf "found end ~s\n" path)
           (loop (cons path acc) next-q)]
          [else
           (define neighbors (heightmap-neighbors hm (car path)))
           (cond
             [(empty? neighbors)
-             (printf "no neighbors for ~s\n" path)
              (loop acc next-q)]
             [else
              (define pos-val (heightmap-ref hm (car path)))
@@ -57,6 +53,21 @@
                                      [else acc])]
                                   [else acc]))])
                (loop acc (queue-push-list next-q new-paths)))])])])))
-       
-(- (apply min (map length (find-best-signal test-heightmap))) 1)
-(- (apply min (map length (find-best-signal live-heightmap))) 1) 
+
+(define (count-from-heightmap-start hm)
+  (- (apply min (map length (find-best-signal hm (heightmap-start-pos hm)))) 1))
+
+(count-from-heightmap-start test-heightmap)
+(count-from-heightmap-start live-heightmap)
+
+(define (count-from-heightmap-low-points hm)
+  (let ([counts (for/fold ([acc empty])
+                          ([start-pos (heightmap-low-points hm)])
+                  (let ([signals (find-best-signal hm start-pos)])
+                    (if (empty? signals)
+                        acc
+                        (cons (- (apply min (map length signals)) 1) acc))))]) 
+    (apply min counts)))
+
+(count-from-heightmap-low-points test-heightmap)
+(count-from-heightmap-low-points live-heightmap)
