@@ -39,7 +39,7 @@
                  [(and (number? lhs) (list? rhs)) (compare-lists (list lhs) rhs)]
                  [(and (list? lhs) (number? rhs)) (compare-lists lhs (list rhs))]
                  [(and (list? lhs) (list? rhs)) (compare-lists lhs rhs)]
-                 [else (error (format "unknown input lhs=~s; rhs=~s\n" lhs rhs))])])))                                            
+                 [else (error (format "unknown input lhs=~s; rhs=~s\n" lhs rhs))])])))
 
 (module+ test
   (check-true (compare-lists '() '()) "both lists empty") ; 
@@ -56,6 +56,12 @@
   (check-true (compare-lists '(4) '((4))))
   (check-true (compare-lists '((4)) '((4))))
   (check-true (compare-lists '((4)) '(4)))
+  (check-true (compare-lists '(4) '((5))))
+  (check-true (compare-lists '((4)) '((5))))
+  (check-true (compare-lists '((4)) '(5)))
+  (check-false (compare-lists '(4) '((3))))
+  (check-false (compare-lists '((4)) '((3))))
+  (check-false (compare-lists '((4)) '(3)))
   (check-false (compare-lists '(((7 0 7 3)) () (6 1 (0) 9)) '(((8 10 9)) (7 (7 () (9 3 6) (1 2 4 7))) (0 2 ())))))
 
 ; returns #f if the packets are out of order

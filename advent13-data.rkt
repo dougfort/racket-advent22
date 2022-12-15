@@ -98,7 +98,9 @@
    (let-values ([(l r) (parse-list (list #\[ #\4 #\, #\5 #\] #\]))])
      (check-equal? l '((4 5)) (format "l ~s; r ~s" l r)))
    (let-values ([(l r) (parse-list (list #\[ #\8 #\] #\, #\[ #\1 #\] #\]))])
-     (check-equal? l '((8) (1)) (format "l ~s; r ~s" l r)))))
+     (check-equal? l '((8) (1)) (format "l ~s; r ~s" l r)))
+   (let-values ([(l r) (parse-list (list #\[ #\[ #\[ #\8 #\] #\] #\] #\, #\[ #\1 #\] #\]))])
+     (check-equal? l '((((8))) (1)) (format "l ~s; r ~s" l r)))))
 
 (define raw-test-data
   "
